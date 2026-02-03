@@ -318,8 +318,8 @@ Understanding the codebase is the first step to contributing. Here is a detailed
 
 | File | Purpose |
 |------|---------|
-| **`intelligence.py`** | **Code Analyst.** Scans the file system to understand the tech stack, directory structure, and "Hero Files" (most important code). It prepares the context for the LLM. |
-| **`narrative.py`** | **The Writer.** Interfaces with AI providers (OpenAI, Anthropic, Groq). Takes the project context and generates the human-readable `README.md` and LinkedIn posts. |
+| **`intelligence.py`** | **Code Analyst.** Scans the file system to understand the tech stack and "Project DNA" (Mobile/Web/CLI). It identifies "Hero Files" (most important code) and efficiently summarizes huge files to save AI context tokens. |
+| **`narrative.py`** | **The Writer.** Interfaces with AI providers (OpenAI, Anthropic, Groq). Uses Dynamic Personas based on Project DNA (e.g., acts as a "Senior Mobile Engineer" for Flutter apps) to generate tailored `README.md` and LinkedIn posts. |
 
 ### 📂 Root Files
 

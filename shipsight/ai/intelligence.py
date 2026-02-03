@@ -39,7 +39,22 @@ class IntelligenceEngine:
                     analysis["frameworks"].append("flutter")
 
         analysis["frameworks"] = list(set(analysis["frameworks"]))
+        analysis["dna"] = self.determine_project_dna(analysis["frameworks"])
         return analysis
+
+    def determine_project_dna(self, frameworks: List[str]) -> str:
+        """Classify project type (Mobile, Web, Backend, CLI) based on stack."""
+        fw_set = set(frameworks)
+        
+        if "flutter" in fw_set or "react-native" in fw_set:
+            return "MOBILE"
+        if "vite" in fw_set or "nextjs" in fw_set or "react" in fw_set or "vue" in fw_set:
+            return "WEB"
+        if "django" in fw_set or "flask" in fw_set or "fastapi" in fw_set:
+            return "BACKEND"
+        
+        # Default fallback
+        return "GENERAL_SOFTWARE"
 
     def get_project_intent(self) -> str:
         """Try to find what the project actually DOES."""
@@ -110,7 +125,21 @@ class IntelligenceEngine:
                     code_lines = [l for l in lines if l.strip() and not l.strip().startswith(("#", "//", "import", "from"))]
                     
                     if len(code_lines) > 15: # Significant implementation
-                        heroes[path.name] = "".join(lines[:70]) # First 70 lines
+                        content = "".join(lines)
+                        
+                        # TOKEN HYGIENE: If file is huge (>300 lines), extract signatures only
+                        if len(lines) > 300:
+                            summary = f"# [SUMMARY] File is large ({len(lines)} lines). Extracting signatures:\n"
+                            import re
+                            # Simple regex for function/class defs in Python/JS/Dart
+                            sigs = re.findall(r'^\s*(?:class|def|function|async|const|let|var|func)\s+\w+', content, re.MULTILINE)
+                            summary += "\n".join(sigs[:50]) # Limit sigs too
+                            if not sigs: summary += "# (No clear signatures found)"
+                            heroes[path.name] = summary
+                        else:
+                            # Full content for smaller files (up to 150 lines or so)
+                             heroes[path.name] = "".join(lines[:150]) 
+                        
                         if len(heroes) >= 5: break
             except: continue
             

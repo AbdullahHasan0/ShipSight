@@ -10,38 +10,61 @@ class NarrativeGenerator:
     def __init__(self, config: AIConfig):
         self.config = config
 
-    async def generate_readme(self, context: str, heroes: dict = None) -> str:
+    async def generate_readme(self, context: str, dna: str = "GENERAL_SOFTWARE", heroes: dict = None) -> str:
+        
+        # DNA-based Persona Selection
+        persona = "Product Manager / Lead Engineer"
+        focus = "FEATURES and USER VALUE"
+        if dna == "MOBILE":
+            persona = "Senior Mobile Engineer / App Launcher"
+            focus = "UX, TOUCH INTERACTIONS, and APP STORE APPEAL"
+        elif dna == "CLI":
+            persona = "Open Source Maintainer / DevTool Expert"
+            focus = "DEVELOPER PRODUCTIVITY, AUTOMATION, and EASE OF USE"
+        
         prompt = f"""
-        Act as a Product Manager / Lead Engineer. Generate a professional README.md focused on FEATURES and USER VALUE.
+        Act as a {persona}. Generate a professional README.md focused on {focus}.
         
         {context}
         
         ### STRICT CONTEXT PURITY RULES:
         - ONLY use information provided in the CONTEXT above.
-        - DO NOT HALLUCINATE features like "Website Roasting", "SEO Analysis", or "Auth Systems" unless they are explicitly mentioned in the context.
-        - If the project is about measurements or lengths, STAY ON TOPIC.
+        - DO NOT HALLUCINATE features like "Website Roasting" or "SEO Analysis" unless explicitly in context.
+        - If project is {dna} (e.g. Flutter/Mobile), use appropriate terminology (Screen vs Page, Tap vs Click).
         - Focus on "What the project does", "Key Features", and "How to use it".
         - DO NOT use emojis anywhere in the README.
         """
         return await self._call_llm(prompt)
 
-    async def generate_linkedin_post(self, context: str) -> str:
-        prompt = f"""
-        Generate a "Feature Showcase" LinkedIn post. Focus on REAL-WORLD CAPABILITIES and IMPACT.
+    async def generate_linkedin_post(self, context: str, dna: str = "GENERAL_SOFTWARE") -> str:
         
+        # DNA-based Guidelines
+        guidelines = "- Hook: A punchy benefit."
+        if dna == "MOBILE":
+            guidelines = "- Hook: Focus on the 'App Experience' or 'Utility on the go'.\n- Use mobile terms: 'Tap', 'Swipe', 'Pocket-sized power'."
+        elif dna == "CLI":
+            guidelines = "- Hook: Focus on 'Speed', 'Automation', or 'Saving Developer Time'.\n- Use dev terms: 'Terminal', 'Workflow', 'Pipeline'."
+            
+        prompt = f"""
+        Generate a "Feature Showcase" LinkedIn post.
+        
+        CONTEXT:
         {context}
         
-        ### ANTI-HALLUCINATION GUARDRAILS:
-        - NEVER mention features from previous projects (e.g., SEO, Roasters, A/B testing) if they are not in the context.
-        - Use the PHILOSOPHY and CORE GOAL sections from the context to find the "Soul" of this project.
-        - If the project name is "LenghtEverything", talk about LENGTHS and VISUALIZATION, not websites.
+        TASK:
+        1. Analyze the features in the context.
+        2. Pick the top 3 most impressive features.
+        3. Write a viral LinkedIn post using the persona of a {dna} Expert.
         
-        Guidelines for a VIRAL Showcase Post:
-        - Hook: A punchy benefit (e.g., "Ever wondered how long a blue whale really is?").
-        - List 3 unique features found in the context.
-        - Tone: Energetic, innovative, result-oriented, enthusiastic, less 'engineer', more 'creator'.
-        - Mention the TECH STACK briefly at the bottom.
-        - DO NOT use emojis anywhere in the post.
+        GUIDELINES:
+        {guidelines}
+        - Tone: Energetic, innovative, less 'corporate', more 'builder'.
+        - NO EMOJIS.
+        - Bottom line: Mention TECH STACK (e.g. Built with Flutter 💙).
+        
+        ### ANTI-HALLUCINATION:
+        - If the app is named 'LenghtEverything', it is about MEASURING LENGTHS. It is NOT about SEO, Roasting, or Websites.
+        - DO NOT invent features not in the context.
         """
         return await self._call_llm(prompt)
 

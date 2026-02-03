@@ -30,6 +30,8 @@ ShipSight is a CLI tool that analyzes your codebase, captures screenshots of you
 ### 🛡️ Smart Detection
 - **Framework Auto-Detection**: Identifies FastAPI, Flask, Django, Next.js, Vite, Flutter
 - **CLI Tool Recognition**: Distinguishes between web apps, CLI tools, and libraries
+- **Project DNA**: Detects project type (Mobile, Web, CLI, Backend) to tailor AI content
+- **Smart Provider Detection**: Auto-switches AI provider if API keys are found in environment variables
 - **Port Discovery**: Automatically finds the correct port for your app
 
 ## Installation
@@ -88,6 +90,13 @@ shipsight auth --groq YOUR_GROQ_API_KEY
 ```
 
 **Note**: Environment variables (.env) take precedence over CLI configuration.
+
+#### Smart Provider Detection
+
+ShipSight automatically detects which provider to use based on your API keys. 
+- If you add `OPENAI_API_KEY`, it auto-switches to OpenAI (uses GPT-4).
+- If you add `ANTHROPIC_API_KEY`, it auto-switches to Anthropic (uses Claude 3).
+- **Default**: Without keys, it defaults to local Ollama.
 
 ## Examples
 

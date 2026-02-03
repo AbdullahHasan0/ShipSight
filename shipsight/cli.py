@@ -114,8 +114,9 @@ async def _run_flow(project_path: Path, config_path: Path, static: bool = False)
             
             # 5. Narrative Generation
             narrative = NarrativeGenerator(cfg.ai)
-            readme = await narrative.generate_readme(context, heroes)
-            linkedin = await narrative.generate_linkedin_post(context)
+            dna = analysis.get("dna", "GENERAL_SOFTWARE")
+            readme = await narrative.generate_readme(context, dna=dna, heroes=heroes)
+            linkedin = await narrative.generate_linkedin_post(context, dna=dna)
             
             # 6. Code Carbonization (Visual Proof)
             carbon = Carbonizer(output_dir)
