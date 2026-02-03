@@ -178,7 +178,7 @@ class Carbonizer:
         
         async with async_playwright() as p:
             browser = await p.chromium.launch()
-            page = await browser.new_page(viewport={{'width': 1400, 'height': 1000}})
+            page = await browser.new_page(viewport={'width': 1400, 'height': 1000})
             await page.set_content(html_template)
             
             # Wait for Highlight.js to load and syntax highlighting to apply
