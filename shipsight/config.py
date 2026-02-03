@@ -68,4 +68,45 @@ def load_config(local_path: Path) -> ShipSightConfig:
         if current_model in decommissioned or not current_model:
             config_data["ai"]["model"] = "llama-3.1-8b-instant"
 
+    # 4. ENV VAR OVERRIDES (Highest Priority)
+    
+    # helper to check nested keys
+    if "ai" not in config_data:
+        config_data["ai"] = {}
+        
+    import os
+    
+    # Map Env Vars to Config
+    env_map = {
+        "OPENAI_API_KEY": ("ai", "openai_api_key"),
+        "ANTHROPIC_API_KEY": ("ai", "anthropic_api_key"),
+        "GROQ_API_KEY": ("ai", "groq_api_key"),
+        "AI_PROVIDER": ("ai", "provider"),
+        "AI_MODEL": ("ai", "model"),
+    }
+    
+    for env_key, (section, config_key) in env_map.items():
+        val = os.getenv(env_key)
+        if val:
+            config_data[section][config_key] = val
+
+    # 5. Smart Provider Detection (if still default)
+    # If provider is explicitly set by user (via yaml or env), respect it.
+    # If it's effectively default (ollama) but we see keys for others, switch.
+    
+    ai_config = config_data.get("ai", {})
+    provider = ai_config.get("provider", "ollama")
+    
+    # If user hasn't explicitly set provider to something else, or if it's default
+    if provider == "ollama":
+        if ai_config.get("openai_api_key"):
+            config_data["ai"]["provider"] = "openai"
+            if not ai_config.get("model"): config_data["ai"]["model"] = "gpt-4-turbo-preview"
+        elif ai_config.get("anthropic_api_key"):
+            config_data["ai"]["provider"] = "anthropic"
+            if not ai_config.get("model"): config_data["ai"]["model"] = "claude-3-opus-20240229"
+        elif ai_config.get("groq_api_key"):
+            config_data["ai"]["provider"] = "groq"
+            if not ai_config.get("model"): config_data["ai"]["model"] = "llama-3.1-8b-instant"
+
     return ShipSightConfig(**config_data)
