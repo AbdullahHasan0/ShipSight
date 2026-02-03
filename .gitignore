@@ -80,6 +80,7 @@ Thumbs.db
 # Node modules (for test projects)
 node_modules/
 dummy_*/node_modules/
+.skills/
 
 # Build artifacts
 *.pyc
