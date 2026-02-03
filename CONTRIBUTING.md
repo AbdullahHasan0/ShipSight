@@ -288,21 +288,46 @@ def carbonize(self, code: str, filename: str) -> None:
 - Add entry to CHANGELOG.md (if exists)
 - Follow [Keep a Changelog](https://keepachangelog.com/) format
 
-## Project Structure
+## Project Structure & File Guide
 
-```
-shipsight/
-├── shipsight/           # Main package
-│   ├── ai/             # AI/LLM integration
-│   ├── capture/        # Screenshot and code visualization
-│   ├── engine/         # Project detection and execution
-│   ├── cli.py          # CLI interface
-│   └── config.py       # Configuration management
-├── tests/              # Test suite
-├── .env.example        # Environment variable template
-├── pyproject.toml      # Project metadata and dependencies
-└── README.md           # Project documentation
-```
+Understanding the codebase is the first step to contributing. Here is a detailed breakdown of the `shipsight/` package:
+
+### 📂 `shipsight/` (Main Package)
+
+| File | Purpose |
+|------|---------|
+| **`cli.py`** | **The Entry Point.** Handles command-line arguments (using `click`), initializes configuration, and orchestrates the high-level flow (Run -> Capture -> AI -> Output). Start here to understand the user journey. |
+| **`config.py`** | **Configuration Management.** Defines Pydantic models for valid configuration (`RunConfig`, `AIConfig`). Handles loading from `shipsight.yml`, environment variables (`.env`), and merging defaults. |
+| **`artifacts.py`** | **Output Manager.** Responsible for saving generated files (markdown, JSON, images) to the `shipsight_output/` directory in a structured way. |
+
+### 📂 `shipsight/engine/` (Execution Layer)
+
+| File | Purpose |
+|------|---------|
+| **`discovery.py`** | **Project Detective.** Analyzes a directory to guess how to run it. Detects frameworks (Next.js, FastAPI, Flutter), finds entry points (`main.py`, `package.json`), and suggests a `shipsight.yml` config. |
+| **`orchestrator.py`** | **Process Manager.** Actually runs the project. It handles starting the subprocess (e.g., `npm run dev`), waiting for the port to be ready, and stream-logging output. It ensures the app is "live" before capturing starts. |
+
+### 📂 `shipsight/capture/` (Visual Layer)
+
+| File | Purpose |
+|------|---------|
+| **`crawler.py`** | **Screenshot Engine.** Uses Playwright to launch a headless browser, navigate to the running app, discover routes (via links), and take high-resolution screenshots. |
+| **`carbon.py`** | **Code Artist.** Generates beautiful, syntax-highlighted images of source code. Uses a headless browser to render code with advanced themes (Monokai, Dracula) and macOS-style window borders. |
+
+### 📂 `shipsight/ai/` (Intelligence Layer)
+
+| File | Purpose |
+|------|---------|
+| **`intelligence.py`** | **Code Analyst.** Scans the file system to understand the tech stack, directory structure, and "Hero Files" (most important code). It prepares the context for the LLM. |
+| **`narrative.py`** | **The Writer.** Interfaces with AI providers (OpenAI, Anthropic, Groq). Takes the project context and generates the human-readable `README.md` and LinkedIn posts. |
+
+### 📂 Root Files
+
+| File | Purpose |
+|------|---------|
+| **`pyproject.toml`** | Project metadata and dependencies. |
+| **`.env.example`** | Template for API keys. |
+| **`README.md`** | User-facing documentation. |
 
 ## Adding Framework Support
 
