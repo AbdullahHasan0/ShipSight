@@ -1,0 +1,1 @@
+# ShipSight Core Package

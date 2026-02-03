@@ -1,0 +1,49 @@
+{
+  "name": "LenghtEverything",
+  "description": "# React + TypeScript + Vite\n\nThis template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.\n\nCurrently, two official plugins are available:\n\n- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh\n- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/ma",
+  "frameworks": [
+    "nextjs",
+    "python",
+    "docker",
+    "vite",
+    "node"
+  ],
+  "file_counts": {
+    ".md": 528,
+    ".yml": 2,
+    ".js": 11,
+    ".html": 4,
+    ".db": 1,
+    ".json": 41,
+    ".ts": 22,
+    ".py": 424,
+    ".sh": 25,
+    ".txt": 50,
+    ".ttf": 54,
+    ".jsx": 2,
+    ".xsd": 78,
+    ".xml": 6,
+    ".jsonl": 1,
+    ".patch": 649,
+    ".yaml": 1,
+    ".gif": 1,
+    ".tape": 1,
+    ".cast": 1,
+    ".png": 3,
+    ".db-shm": 1,
+    ".db-wal": 1,
+    ".sql": 1,
+    ".css": 5,
+    ".tsx": 23,
+    ".pdf": 1,
+    ".csv": 23,
+    ".gz": 1,
+    ".dot": 1,
+    ".svg": 2
+  },
+  "heroes": [
+    "index.ts",
+    "db.ts",
+    "migrations.ts"
+  ]
+}

@@ -1,0 +1,71 @@
+import yaml
+from pathlib import Path
+from pydantic import BaseModel, Field
+from typing import List, Optional
+from dotenv import load_dotenv
+
+load_dotenv() # Load from .env if it exists
+
+class RunConfig(BaseModel):
+    strategy: str = "local" # local, docker, or static
+    port: Optional[int] = None
+    command: Optional[str] = None
+
+class CaptureConfig(BaseModel):
+    routes: List[str] = Field(default_factory=lambda: ["/"])
+    auth_enabled: bool = False
+    viewport: dict = {"width": 1280, "height": 720}
+
+class OutputConfig(BaseModel):
+    anonymize: bool = False
+    formats: List[str] = ["readme", "linkedin"]
+    path: str = "shipsight_output"
+
+class AIConfig(BaseModel):
+    provider: str = "ollama" # ollama, openai, anthropic, or groq
+    model: str = "llama-3.1-8b-instant"
+    openai_api_key: Optional[str] = Field(default=None, env="OPENAI_API_KEY")
+    anthropic_api_key: Optional[str] = Field(default=None, env="ANTHROPIC_API_KEY")
+    groq_api_key: Optional[str] = Field(default=None, env="GROQ_API_KEY")
+
+class ShipSightConfig(BaseModel):
+    run: RunConfig = Field(default_factory=RunConfig)
+    capture: CaptureConfig = Field(default_factory=CaptureConfig)
+    output: OutputConfig = Field(default_factory=OutputConfig)
+    ai: AIConfig = Field(default_factory=AIConfig)
+
+def get_global_config_path() -> Path:
+    return Path.home() / ".shipsight" / "config.yml"
+
+def load_config(local_path: Path) -> ShipSightConfig:
+    global_path = get_global_config_path()
+    
+    # 1. Load global config (keys)
+    config_data = {}
+    if global_path.exists():
+        with open(global_path, "r") as f:
+            config_data = yaml.safe_load(f) or {}
+    
+    # 2. Load local project config (runs/routes) override global
+    if local_path.exists():
+        with open(local_path, "r") as f:
+            local_data = yaml.safe_load(f) or {}
+            # Deep merge simple dicts
+            for key in ["run", "capture", "output", "ai"]:
+                if key in local_data:
+                    if key not in config_data:
+                        config_data[key] = {}
+                    config_data[key].update(local_data[key])
+    
+    # 3. AUTO-MIGRATION: Swap decommissioned Groq models
+    ai_settings = config_data.get("ai", {})
+    current_model = ai_settings.get("model")
+    
+    # List of known decommissioned Groq models
+    decommissioned = ["llama3-8b-8192", "llama3-70b-8192", "mixtral-8x7b-32768"]
+    
+    if ai_settings.get("provider") == "groq":
+        if current_model in decommissioned or not current_model:
+            config_data["ai"]["model"] = "llama-3.1-8b-instant"
+
+    return ShipSightConfig(**config_data)

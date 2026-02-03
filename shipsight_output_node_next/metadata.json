@@ -1,0 +1,51 @@
+{
+  "name": "WebsiteRoaster",
+  "description": "# \ud83e\udd96 JudgeMyPage.ai\n\n[![Next.js](https://img.shields.io/badge/Next.js-15+-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)\n[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)\n[![Tailwind](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)\n[![Prisma](https://img.shields.io/badge/Prisma-6.2-2D3748?style=for-the-badge&logo=prisma)](https:",
+  "frameworks": [
+    "node",
+    "nextjs",
+    "python",
+    "vite"
+  ],
+  "file_counts": {
+    ".local": 1,
+    ".ts": 27,
+    ".js": 8,
+    ".json": 45,
+    ".md": 614,
+    ".yml": 1,
+    ".png": 5,
+    ".py": 449,
+    ".sh": 25,
+    ".txt": 49,
+    ".html": 3,
+    ".ttf": 54,
+    ".jsx": 2,
+    ".xsd": 78,
+    ".xml": 6,
+    ".jpeg": 3,
+    ".mp3": 1,
+    ".jsonl": 1,
+    ".patch": 649,
+    ".yaml": 1,
+    ".gif": 1,
+    ".tape": 1,
+    ".cast": 1,
+    ".db-shm": 1,
+    ".db-wal": 1,
+    ".sql": 1,
+    ".css": 3,
+    ".tsx": 19,
+    ".pdf": 1,
+    ".csv": 23,
+    ".gz": 1,
+    ".dot": 1,
+    ".db": 2,
+    ".prisma": 1
+  },
+  "heroes": [
+    "cache.py",
+    "dates.py",
+    "dedupe.py"
+  ]
+}

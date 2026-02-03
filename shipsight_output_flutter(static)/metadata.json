@@ -1,0 +1,46 @@
+{
+  "name": "QR_code_scanner",
+  "description": "# qr_code_scanner_project\n\nA new Flutter project.\n\n## Getting Started\n\nThis project is a starting point for a Flutter application.\n\nA few resources to get you started if this is your first Flutter project:\n\n- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)\n- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)\n\nFor help getting started with Flutter development, view the\n[online documentation](https://docs.flutter.dev/), which offers tutorials,\ns",
+  "frameworks": [
+    "flutter"
+  ],
+  "file_counts": {
+    ".yaml": 2,
+    ".lock": 1,
+    ".md": 2,
+    ".yml": 1,
+    ".gradle": 3,
+    ".properties": 2,
+    ".xml": 7,
+    ".kt": 1,
+    ".png": 35,
+    ".plist": 7,
+    ".xcconfig": 8,
+    ".swift": 6,
+    ".h": 8,
+    ".json": 4,
+    ".storyboard": 2,
+    ".pbxproj": 2,
+    ".xcworkspacedata": 3,
+    ".xcsettings": 2,
+    ".xcscheme": 2,
+    ".dart": 9,
+    ".txt": 5,
+    ".cc": 4,
+    ".cmake": 2,
+    ".entitlements": 2,
+    ".xib": 1,
+    ".html": 1,
+    ".cpp": 4,
+    ".manifest": 1,
+    ".rc": 1,
+    ".ico": 1
+  },
+  "heroes": [
+    "app.router.dart",
+    "appText.dart",
+    "scanResult.dart",
+    "scannerView.dart",
+    "scannerViewModel.dart"
+  ]
+}

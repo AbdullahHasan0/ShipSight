@@ -1,0 +1,28 @@
+[project]
+name = "shipsight"
+version = "0.1.0"
+description = "Convert running projects into shareable proof (visuals + narrative) automatically."
+authors = [
+    { name = "ShipSight Team" }
+]
+requires-python = ">=3.11"
+dependencies = [
+    "click>=8.1.7",
+    "playwright>=1.41.2",
+    "pydantic>=2.6.1",
+    "pyyaml>=6.0.1",
+    "rich>=13.7.0",
+    "httpx>=0.26.0",
+    "python-dotenv>=1.0.0",
+]
+
+[project.scripts]
+shipsight = "shipsight.cli:main"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["shipsight*"]
