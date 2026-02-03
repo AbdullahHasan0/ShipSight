@@ -99,13 +99,18 @@ def load_config(local_path: Path) -> ShipSightConfig:
     
     # If user hasn't explicitly set provider to something else, or if it's default
     if provider == "ollama":
-        if ai_config.get("openai_api_key"):
+        # Helper to check if key is real and not a placeholder
+        def is_valid_key(k):
+            val = ai_config.get(k)
+            return val and "your_" not in val and len(val) > 10
+
+        if is_valid_key("openai_api_key"):
             config_data["ai"]["provider"] = "openai"
             if not ai_config.get("model"): config_data["ai"]["model"] = "gpt-4-turbo-preview"
-        elif ai_config.get("anthropic_api_key"):
+        elif is_valid_key("anthropic_api_key"):
             config_data["ai"]["provider"] = "anthropic"
             if not ai_config.get("model"): config_data["ai"]["model"] = "claude-3-opus-20240229"
-        elif ai_config.get("groq_api_key"):
+        elif is_valid_key("groq_api_key"):
             config_data["ai"]["provider"] = "groq"
             if not ai_config.get("model"): config_data["ai"]["model"] = "llama-3.1-8b-instant"
 

@@ -78,6 +78,11 @@ class NarrativeGenerator:
                         timeout=60.0
                     )
                     result = response.json()
+                    
+                    if response.status_code != 200:
+                        error_msg = result.get("error", {}).get("message", "Unknown error")
+                        return f"Error from OpenAI API ({response.status_code}): {error_msg}"
+                        
                     return result["choices"][0]["message"]["content"]
             except Exception as e:
                 return f"Error calling OpenAI: {e}"
@@ -103,6 +108,12 @@ class NarrativeGenerator:
                         timeout=60.0
                     )
                     result = response.json()
+                    
+                    if response.status_code != 200:
+                        error_type = result.get("error", {}).get("type", "Unknown type")
+                        error_msg = result.get("error", {}).get("message", "Unknown error")
+                        return f"Error from Anthropic API ({response.status_code}): {error_type} - {error_msg}"
+                        
                     return result["content"][0]["text"]
             except Exception as e:
                 return f"Error calling Anthropic: {e}"
