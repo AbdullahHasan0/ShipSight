@@ -2,6 +2,13 @@ import os
 from pathlib import Path
 from typing import Dict, List
 
+# Centralized ignore list for all analysis methods
+IGNORES = [
+    ".git", "node_modules", ".venv", "__pycache__", "shipsight_output", 
+    "dist", ".next", ".skills", ".idea", ".vscode", "tools", "scripts", 
+    "build", "coverage", ".pytest_cache", ".config"
+]
+
 class IntelligenceEngine:
     def __init__(self, project_path: Path):
         self.project_path = project_path
@@ -75,9 +82,9 @@ class IntelligenceEngine:
             if readme_path.exists():
                 try:
                     with open(readme_path, "r", encoding="utf-8") as f:
-                        content = f.read(1000)
+                        content = f.read(2000)
                         # Just return the first few sentences
-                        return content[:500].strip()
+                        return content[:1200].strip()
                 except: pass
         
         return "Unknown Purpose"
@@ -91,7 +98,7 @@ class IntelligenceEngine:
         found_files = []
         for root, dirs, files in os.walk(self.project_path):
             # Strict ignore
-            if any(p in root for p in [".git", "node_modules", ".venv", "__pycache__", "dist", ".next"]):
+            if any(p in root for p in IGNORES):
                 continue
             
             for file in files:
@@ -127,8 +134,8 @@ class IntelligenceEngine:
                     if len(code_lines) > 15: # Significant implementation
                         content = "".join(lines)
                         
-                        # TOKEN HYGIENE: If file is huge (>300 lines), extract signatures only
-                        if len(lines) > 300:
+                        # TOKEN HYGIENE: If file is substantial (>100 lines), extract signatures only
+                        if len(lines) > 100:
                             summary = f"# [SUMMARY] File is large ({len(lines)} lines). Extracting signatures:\n"
                             import re
                             # Simple regex for function/class defs in Python/JS/Dart
@@ -161,20 +168,9 @@ class IntelligenceEngine:
             if doc_path.exists():
                 content = doc_path.read_text(errors="ignore")
                 doc_gist += f"\n--- {doc_name} ---\n{content[:500]}...\n"
-                
-                # Semantic Extraction
-                if "Design Philosophy" in content:
-                    phil = content.split("Design Philosophy")[1].split("\n")[1:3]
-                    unique_concepts.add(f"PHILOSOPHY: {' '.join(phil).strip()}")
-                if "Goal" in content or "Purpose" in content:
-                    key = "Goal" if "Goal" in content else "Purpose"
-                    goal = content.split(key)[1].split("\n")[1:3]
-                    unique_concepts.add(f"CORE GOAL: {' '.join(goal).strip()}")
 
         context += f"PROJECT INTENT/PURPOSE (Deducted): {analysis['description']}\n"
         context += f"DOCUMENTATION GIST: {doc_gist}\n"
-        if unique_concepts:
-            context += f"UNIQUE CONCEPTS IDENTIFIED: {list(unique_concepts)}\n"
 
         # 3. Code Samples
         if heroes:
@@ -184,12 +180,12 @@ class IntelligenceEngine:
         context += f"\nPROJECT STRUCTURE SAMPLE:\n{self.get_deep_structure()}"
         return context
 
-    def get_deep_structure(self, max_files: int = 100) -> str:
+    def get_deep_structure(self, max_files: int = 50) -> str:
         """Recursively list representative files to give LLM a sense of the architecture."""
         structure = []
         count = 0
         for root, dirs, files in os.walk(self.project_path):
-            if any(p in root for p in [".git", "node_modules", ".venv", "__pycache__", "shipsight_output", "dist", ".next"]):
+            if any(p in root for p in IGNORES):
                 continue
             
             rel_path = os.path.relpath(root, self.project_path)

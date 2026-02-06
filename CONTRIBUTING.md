@@ -22,12 +22,12 @@ We are committed to providing a welcoming and inclusive environment. Please be r
 1. **Fork the repository** on GitHub
 2. **Clone your fork** locally:
    ```bash
-   git clone https://github.com/YOUR_USERNAME/shipsight.git
+   git clone https://github.com/shipsight/shipsight.git
    cd shipsight
    ```
 3. **Add upstream remote**:
    ```bash
-   git remote add upstream https://github.com/ORIGINAL_OWNER/shipsight.git
+   git remote add upstream https://github.com/shipsight/shipsight.git
    ```
 
 ## Development Setup
@@ -311,15 +311,15 @@ Understanding the codebase is the first step to contributing. Here is a detailed
 
 | File | Purpose |
 |------|---------|
-| **`crawler.py`** | **Screenshot Engine.** Uses Playwright to launch a headless browser, navigate to the running app, discover routes (via links), and take high-resolution screenshots. |
-| **`carbon.py`** | **Code Artist.** Generates beautiful, syntax-highlighted images of source code. Uses a headless browser to render code with advanced themes (Monokai, Dracula) and macOS-style window borders. |
+| **`crawler.py`** | **Visual Engine.** Uses Playwright to launch a headless browser, discover routes (via links), and take high-resolution screenshots of your running app. |
+| **`carbon.py`** | **Code Artist.** Generates beautiful, syntax-highlighted images of source code. Uses a headless browser to render code with macOS-style window borders and vibrant themes. |
 
 ### 📂 `shipsight/ai/` (Intelligence Layer)
 
 | File | Purpose |
 |------|---------|
-| **`intelligence.py`** | **Code Analyst.** Scans the file system to understand the tech stack and "Project DNA" (Mobile/Web/CLI). It identifies "Hero Files" (most important code) and efficiently summarizes huge files to save AI context tokens. |
-| **`narrative.py`** | **The Writer.** Interfaces with AI providers (OpenAI, Anthropic, Groq). Uses Dynamic Personas based on Project DNA (e.g., acts as a "Senior Mobile Engineer" for Flutter apps) to generate tailored `README.md` and LinkedIn posts. |
+| **`intelligence.py`** | **Code Analyst.** Scans the file system to understand the tech stack and "Project DNA" (Mobile/Web/CLI). It features a strict **Context Hygiene** list to ignore generic templates and summarizes huge files to save tokens. |
+| **`narrative.py`** | **The Writer.** Interfaces with AI providers (OpenAI, Anthropic, Groq). Uses **Dynamic Personas** and a **Creator-Voice** prompt to generate authentic READMEs and LinkedIn posts. |
 
 ### 📂 Root Files
 

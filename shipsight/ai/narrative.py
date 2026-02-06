@@ -7,8 +7,34 @@ from shipsight.config import AIConfig
 console = Console()
 
 class NarrativeGenerator:
-    def __init__(self, config: AIConfig):
+    def __init__(self, config: AIConfig, project_name: str = "Unknown"):
         self.config = config
+        self.project_name = project_name
+
+    def _log_usage(self, provider: str, model: str, usage: dict):
+        """Log token usage to ~/.shipsight/token_usage.jsonl"""
+        try:
+            import json
+            import datetime
+            from pathlib import Path
+            
+            log_dir = Path.home() / ".shipsight"
+            log_dir.mkdir(exist_ok=True)
+            log_file = log_dir / "token_usage.jsonl"
+            
+            record = {
+                "timestamp": datetime.datetime.now().isoformat(),
+                "project": self.project_name,
+                "provider": provider,
+                "model": model,
+                "usage": usage
+            }
+            
+            with open(log_file, "a", encoding="utf-8") as f:
+                f.write(json.dumps(record) + "\n")
+        except Exception as e:
+            # logging shouldn't crash the app
+            console.print(f"[dim yellow]Warning: Failed to log token usage: {e}[/dim yellow]")
 
     async def generate_readme(self, context: str, dna: str = "GENERAL_SOFTWARE", heroes: dict = None) -> str:
         
@@ -39,32 +65,46 @@ class NarrativeGenerator:
     async def generate_linkedin_post(self, context: str, dna: str = "GENERAL_SOFTWARE") -> str:
         
         # DNA-based Guidelines
-        guidelines = "- Hook: A punchy benefit."
+        guidelines = "- Hook: A clear, problem-solving opening."
         if dna == "MOBILE":
-            guidelines = "- Hook: Focus on the 'App Experience' or 'Utility on the go'.\n- Use mobile terms: 'Tap', 'Swipe', 'Pocket-sized power'."
+            guidelines = "- Hook: Focus on the 'App Utility' or 'User Experience'.\n- Use mobile terms: 'Tap', 'Native feel', 'On the go'."
         elif dna == "CLI":
-            guidelines = "- Hook: Focus on 'Speed', 'Automation', or 'Saving Developer Time'.\n- Use dev terms: 'Terminal', 'Workflow', 'Pipeline'."
+            guidelines = "- Hook: Focus on 'Efficiency' and 'Developer Experience'.\n- Use dev terms: 'Script', 'Workflow', 'Automation'."
             
         prompt = f"""
-        Generate a "Feature Showcase" LinkedIn post.
+        Generate an "Authentic Developer LinkedIn Post" as the CREATOR of this project.
         
         CONTEXT:
         {context}
         
         TASK:
-        1. Analyze the features in the context.
-        2. Pick the top 3 most impressive features.
-        3. Write a viral LinkedIn post using the persona of a {dna} Expert.
+        1. Start with the PROBLEM: "I needed a way to..." or "I wanted to build..."
+        2. Explain the SOLUTION: "So I built {self.project_name}, a [What it is]..."
+        3. List 3 Technical Features: "It features X, Y, and Z..."
         
         GUIDELINES:
         {guidelines}
-        - Tone: Energetic, innovative, less 'corporate', more 'builder'.
-        - NO EMOJIS.
-        - Bottom line: Mention TECH STACK (e.g. Built with Flutter 💙).
+        - Voice: First-person ("I built", "I used").
         
-        ### ANTI-HALLUCINATION:
-        - If the app is named 'LenghtEverything', it is about MEASURING LENGTHS. It is NOT about SEO, Roasting, or Websites.
-        - DO NOT invent features not in the context.
+        TASK:
+        1. Start with the PROBLEM: "I needed a way to..." or "I wanted to build..."
+        2. Explain the SOLUTION: "So I built {self.project_name}, a [What it is]..."
+        3. List 3 Technical Features: "It features X, Y, and Z..."
+        
+        GUIDELINES:
+        {guidelines}
+        - Voice: First-person ("I built", "I used").
+        - Focus: 80% on the CODE/FEATURES, 20% on the backend stack.
+        - NO EMOJIS (except maybe one at the end).
+        
+        ### ANTI-DIARY RULE:
+        - DO NOT talk about "learning about yourself", "personal growth", "versatility", or "challenges". 
+        - DO NOT say "This project showcases my ability to..."
+        - Keep it technical and product-focused.
+        
+        ### ANTI-HYPE GUARDRAILS:
+        - DO NOT use: "Revolutionary", "Groundbreaking", "Game-changer", "Cosmic".
+        - Simple tone: "Here is what I made. Here is how it works."
         """
         return await self._call_llm(prompt)
 
@@ -78,7 +118,18 @@ class NarrativeGenerator:
                         json={"model": self.config.model, "prompt": prompt, "stream": False},
                         timeout=30.0
                     )
-                    return response.json().get("response", "Error: LLM failed to respond.")
+                    result_json = response.json()
+                    
+                    # Log Usage (Ollama)
+                    # Ollama returns 'prompt_eval_count' and 'eval_count'
+                    if "prompt_eval_count" in result_json:
+                         self._log_usage("ollama", self.config.model, {
+                             "prompt_tokens": result_json.get("prompt_eval_count", 0),
+                             "completion_tokens": result_json.get("eval_count", 0),
+                             "total_tokens": result_json.get("prompt_eval_count", 0) + result_json.get("eval_count", 0)
+                         })
+
+                    return result_json.get("response", "Error: LLM failed to respond.")
             except Exception as e:
                 return f"Error connecting to local LLM: {e}. Ensure Ollama is running or configure OpenAI/Anthropic."
         elif self.config.provider == "openai":
@@ -105,6 +156,10 @@ class NarrativeGenerator:
                     if response.status_code != 200:
                         error_msg = result.get("error", {}).get("message", "Unknown error")
                         return f"Error from OpenAI API ({response.status_code}): {error_msg}"
+                    
+                    # Log Usage (OpenAI)
+                    if "usage" in result:
+                        self._log_usage("openai", self.config.model, result["usage"])
                         
                     return result["choices"][0]["message"]["content"]
             except Exception as e:
@@ -136,6 +191,17 @@ class NarrativeGenerator:
                         error_type = result.get("error", {}).get("type", "Unknown type")
                         error_msg = result.get("error", {}).get("message", "Unknown error")
                         return f"Error from Anthropic API ({response.status_code}): {error_type} - {error_msg}"
+                    
+                    # Log Usage (Anthropic)
+                    if "usage" in result:
+                        usage = result["usage"]
+                        # standardize fields
+                        std_usage = {
+                            "prompt_tokens": usage.get("input_tokens", 0),
+                            "completion_tokens": usage.get("output_tokens", 0),
+                            "total_tokens": usage.get("input_tokens", 0) + usage.get("output_tokens", 0)
+                        }
+                        self._log_usage("anthropic", self.config.model, std_usage)
                         
                     return result["content"][0]["text"]
             except Exception as e:
@@ -163,6 +229,10 @@ class NarrativeGenerator:
                     if response.status_code != 200:
                         error_msg = result.get("error", {}).get("message", "Unknown error")
                         return f"Error from Groq API ({response.status_code}): {error_msg}"
+                    
+                    # Log Usage (Groq - same structure as OpenAI)
+                    if "usage" in result:
+                        self._log_usage("groq", self.config.model, result["usage"])
                         
                     return result["choices"][0]["message"]["content"]
             except Exception as e:

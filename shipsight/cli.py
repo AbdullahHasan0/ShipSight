@@ -2,6 +2,7 @@ import asyncio
 import click
 from pathlib import Path
 from rich.console import Console
+from rich.prompt import Confirm
 from shipsight.config import load_config, get_global_config_path
 from shipsight.engine.orchestrator import Orchestrator
 from shipsight.engine.discovery import ConfigDiscovery
@@ -113,7 +114,7 @@ async def _run_flow(project_path: Path, config_path: Path, static: bool = False)
                 console.print(f"[yellow]{mode_name} Mode detected. Skipping web capture steps.[/yellow]")
             
             # 5. Narrative Generation
-            narrative = NarrativeGenerator(cfg.ai)
+            narrative = NarrativeGenerator(cfg.ai, project_name=project_path.name)
             dna = analysis.get("dna", "GENERAL_SOFTWARE")
             readme = await narrative.generate_readme(context, dna=dna, heroes=heroes)
             linkedin = await narrative.generate_linkedin_post(context, dna=dna)
@@ -142,7 +143,7 @@ async def _run_flow(project_path: Path, config_path: Path, static: bool = False)
         
         # Fallback Prompt
         if not static:
-            if click.confirm("[yellow]Would you like to try running in Static Mode (analysis only)? [/yellow]", default=True):
+            if Confirm.ask("[yellow]Would you like to try running in Static Mode (analysis only)?[/yellow]", default=True):
                 await _run_flow(project_path, config_path, static=True)
 
 if __name__ == "__main__":

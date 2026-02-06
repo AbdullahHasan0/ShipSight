@@ -106,10 +106,10 @@ def load_config(local_path: Path) -> ShipSightConfig:
 
         if is_valid_key("openai_api_key"):
             config_data["ai"]["provider"] = "openai"
-            if not ai_config.get("model"): config_data["ai"]["model"] = "gpt-4-turbo-preview"
+            if not ai_config.get("model"): config_data["ai"]["model"] = "gpt-4o-mini"
         elif is_valid_key("anthropic_api_key"):
             config_data["ai"]["provider"] = "anthropic"
-            if not ai_config.get("model"): config_data["ai"]["model"] = "claude-3-opus-20240229"
+            if not ai_config.get("model"): config_data["ai"]["model"] = "claude-3-5-sonnet-20240620"
         elif is_valid_key("groq_api_key"):
             config_data["ai"]["provider"] = "groq"
             if not ai_config.get("model"): config_data["ai"]["model"] = "llama-3.1-8b-instant"

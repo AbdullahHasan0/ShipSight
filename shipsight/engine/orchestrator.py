@@ -3,9 +3,9 @@ import os
 from pathlib import Path
 from typing import Optional
 from rich.console import Console
+from rich.prompt import Prompt, Confirm
 from shipsight.config import ShipSightConfig
 from shipsight.engine.readiness import wait_for_ready, is_port_open, auto_wait_for_ready
-import click
 
 console = Console()
 
@@ -67,9 +67,9 @@ class Orchestrator:
         # 1. Check for port conflict
         if self.config.run.port and is_port_open("localhost", self.config.run.port):
             console.print(f"[bold yellow]Warning: Port {self.config.run.port} is already in use.[/bold yellow]")
-            choice = click.prompt(
-                "Should ShipSight [u]use the existing service, [k]ill the process using it, or [c]ancel?",
-                type=click.Choice(['u', 'k', 'c'], case_sensitive=False),
+            choice = Prompt.ask(
+                "Should ShipSight [u]u[/u]se the existing service, [u]k[/u]ill the process using it, or [u]c[/u]ancel?",
+                choices=['u', 'k', 'c'],
                 default='u'
             )
             
@@ -144,7 +144,7 @@ class Orchestrator:
         if not self.is_docker_running():
             console.print("[yellow]Docker daemon is not running.[/yellow]")
             if stack != "unknown" and stack != "docker":
-                if click.confirm(f"Should ShipSight try running the {stack} stack locally instead?"):
+                if Confirm.ask(f"Should ShipSight try running the [bold cyan]{stack}[/bold cyan] stack locally instead?"):
                     return self._start_local(stack)
             return False
 
@@ -173,7 +173,7 @@ class Orchestrator:
             console.print(f"[red]Docker Compose failed: {error_details}[/red]")
             
             if stack != "unknown" and stack != "docker":
-                if click.confirm(f"Should ShipSight try running the {stack} stack locally instead?"):
+                if Confirm.ask(f"Should ShipSight try running the [bold cyan]{stack}[/bold cyan] stack locally instead?"):
                     return self._start_local(stack)
             return False
 
