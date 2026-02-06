@@ -1,117 +1,150 @@
 # ShipSight 🚢
 
-**Convert your running projects into shareable proof (visuals + narrative) automatically.**
+**Turn your running projects into high-quality public proof.**
 
-ShipSight is a zero-config CLI toolkit that analyzes your codebase, captures high-resolution screenshots of your running application, and generates professional documentation—READMEs, LinkedIn posts, and beautiful code snapshots—ready for public showcase.
+ShipSight is an autonomous "Showcase Engine" for software builders. It doesn't just generate a README; it runs your app, crawls your routes, captures high-res visual proof, and crafts a technical narrative from the **Creator's Perspective**.
 
-## 🚀 Quick Start (Zero Setup)
+---
 
-The easiest way to run ShipSight is using our runner scripts which handle virtual environments and dependencies automatically.
+## 🚀 One-Command Start
 
-### Windows
+ShipSight is designed to be zero-config. Our runner scripts handle the environment, dependencies, and execution automatically.
+
+### Windows (PowerShell)
 ```powershell
 .\shipsight.ps1 run "C:\path\to\your\project"
 ```
 
-### Linux / macOS
+### Linux / macOS (Shell)
 ```bash
 ./shipsight.sh run "/path/to/your/project"
 ```
 
 ---
 
-## ✨ Key Features
+## 📸 Visual Proof
 
-### 🧽 Context Hygiene (Loki-Aware)
-ShipSight automatically cleanses your project context before sending it to the AI. It strictly ignores `.git`, `node_modules`, `.venv`, `.skills`, `tools`, and other non-essential directories to prevent hallucinations and ensure the AI focuses on **your actual code**.
+ShipSight captures your hard work exactly as it looks.
 
-### 🤖 Creator-Voice Narrative
-Unlike generic AI generators, ShipSight writes from the **builder's perspective**. 
-- **Authentic Tone**: No hyperbolic "revolutionary" or "groundbreaking" fluff.
-- **Problem/Solution Focus**: Explains *why* you built it and *how* it works.
-- **80/20 Code Focus**: 80% on features/logic, 20% on the backend stack.
+### Automated App Screenshots
+Capture every route in high resolution (2x) automatically.
 
-### 📸 Automated Visual Proof
-- **High-Res Screenshots**: 2x resolution captures of discovered routes.
-- **Route Discovery**: Automatically finds active routes in your web app.
-- **Carbon Visuals**: Beautiful, themeable code snapshots for your core logic.
+![Next.js App Screenshot](examples/nextjs_screenshot.png)
+*Next.js Application with multiple discovered routes*
 
-### 📉 Token Hygiene
-Smart signature extraction for large files. If a file is over 100 lines, ShipSight extracts class/function signatures only, giving the AI the architecture without the token bloat.
+### Beautiful Code Snapshots
+Present your logic with vibrant, macOS-style window borders.
 
-## 🎯 Supported Stacks
-
-| Stack | Frameworks | Default Command |
-|-------|------------|-----------------|
-| **Node.js** | Next.js, Vite, React, Vue | `npm run dev` |
-| **Python** | FastAPI, Flask, Django | `uvicorn` / `python main.py` |
-| **Flutter** | Web, Mobile, Desktop | `flutter run -d web-server` |
-| **Docker** | Compose Projects | `docker-compose up -d` |
-| **CLI/Lib** | Libraries & CLI Tools | Static Analysis Only |
+````carousel
+![TypeScript Logic](examples/code_visual_typescript.png)
+<!-- slide -->
+![Dart State Management](examples/code_visual_dart.png)
+````
 
 ---
 
-## 🛠️ Configuration
+## 🧩 How it Works
 
-### 1. Configure API Keys
-ShipSight supports OpenAI, Anthropic, and Groq. 
-
-**Option A: .env File (Recommended)**
-```bash
-cp .env.example .env
-# Add your OPENAI_API_KEY, ANTHROPIC_API_KEY, or GROQ_API_KEY
+```mermaid
+graph TD
+    A[Project Path] --> B[Discovery Engine]
+    B --> C{Strategy?}
+    C -- Local/Docker --> D[Orchestrator]
+    C -- Static --> E[Context Hygiene]
+    D --> F[Run Subprocess]
+    F --> G[Route Crawler]
+    G --> H[Playwright Capture]
+    H --> E
+    E --> I[AI Narrative Generator]
+    I --> J[Artifact Manager]
+    J --> K[shipsight_output/]
 ```
 
-**Option B: CLI Auth**
-```bash
-shipsight auth --openai YOUR_KEY
-```
+1.  **Discovery**: ShipSight identifies your stack (Node, Python, Flutter, Docker) and configuration.
+2.  **Orchestration**: It starts your app locally or via Docker and waits for port readiness.
+3.  **Capture**: It crawls your app to discover routes and takes high-resolution screenshots.
+4.  **Intelligence**: It scans your code, extracts "Hero" snippets, and cleanses the context (ignoring junk).
+5.  **Output**: It generates a professional README, LinkedIn post, and beautiful code snapshots.
 
-**Smart Detection**: ShipSight auto-switches to the best available provider based on your keys (GPT-4o mini / Claude 3.5 Sonnet).
+---
 
-### 2. Custom Project Config (Optional)
-Create a `shipsight.yml` in your project root for granular control:
+## ⚙️ Configuration Reference
 
+ShipSight works out of the box, but you can control every aspect via `shipsight.yml` in your project root.
+
+### Full `shipsight.yml` Example
 ```yaml
+# Execution Settings
 run:
-  port: 3000
-  strategy: local # local, docker, or static
+  strategy: local      # options: local, docker, static
+  port: 3000           # the port your app runs on (auto-detected if omitted)
+  command: npm run dev # custom startup command
+
+# Visual Capture Settings
 capture:
-  routes: ["/", "/dashboard", "/pricing"]
+  routes:              # specific routes to capture
+    - /
+    - /pricing
+    - /dashboard
+  auth_enabled: false   # set to true if app requires login (upcoming)
+  viewport:
+    width: 1280
+    height: 720
+
+# Output Customization
+output:
+  path: shipsight_output
+  formats: ["readme", "linkedin"]
+  anonymize: false      # wipe sensitive strings (upcoming)
+
+# AI & Narrative Settings
 ai:
-  model: gpt-4o-mini
+  provider: openai      # options: openai, anthropic, groq, ollama
+  model: gpt-4o-mini    # or claude-3-5-sonnet, llama-3.1-8b-instant
 ```
 
 ---
 
-## 📂 Output Structure
+## 🔐 API Key Setup
 
-After a successful run, everything is saved to `shipsight_output/`:
-- `README.generated.md`: Professional project documentation.
-- `linkedin.post.md`: Authentic, shareable social media content.
-- `screenshots/`: High-resolution app captures.
-- `code_visuals/`: Beautiful code snapshots of your "Hero" files.
-- `metadata.json`: Full technical analysis of your project.
+ShipSight needs at least one AI provider to write your narratives. We recommend using a `.env` file in the ShipSight folder.
 
----
+1.  **Create `.env`**: `cp .env.example .env`
+2.  **Add your keys**:
+    - `OPENAI_API_KEY=sk-...` (Auto-switches to GPT-4o mini)
+    - `ANTHROPIC_API_KEY=sk-...` (Auto-switches to Claude 3.5 Sonnet)
+    - `GROQ_API_KEY=gsk-...` (Auto-switches to Llama 3.1 8B)
 
-## 🛠️ Manual Installation (Advanced)
-
-If you prefer not to use the runner scripts:
-1. `python -m venv .venv`
-2. `source .venv/bin/activate` (or `.venv\Scripts\activate`)
-3. `pip install -e .`
-4. `playwright install chromium`
+**Loki-Mode Intelligence**: ShipSight's "Smart Detection" automatically picks the best provider based on the keys it finds in your environment.
 
 ---
 
-## 🤝 Contributing
+## 🛠️ Advanced Manual Setup
 
-We love contributions! Check out our [Contributing Guide](CONTRIBUTING.md) to get started.
+If you prefer to manage the environment yourself:
 
-## 📄 License
-
-MIT © ShipSight Team
+1.  **Clone & Install**:
+    ```bash
+    git clone https://github.com/shipsight/shipsight.git
+    cd shipsight
+    python -m venv .venv
+    source .venv/bin/activate # Windows: .venv\Scripts\activate
+    pip install -e .
+    playwright install chromium
+    ```
+2.  **Run**:
+    ```bash
+    shipsight run "C:\MyProject"
+    ```
 
 ---
-**Built with ❤️ for builders who want to show, not just tell.**
+
+## 🤝 Key Principles
+
+*   **Context Hygiene**: We never send your `node_modules`, `.git`, or `.skills` to the AI. Only the code that matters.
+*   **Anti-Hype Guardrails**: Our narratives are written for developers. No "game-changing" fluff. Just features and stack details.
+*   **Static Fallback**: If your app fails to start, we don't give up. ShipSight switches to "Static Mode" to analyze your code structure and still give you great docs.
+
+---
+
+**Built with ❤️ for those who ship.**
