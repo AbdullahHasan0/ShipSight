@@ -45,7 +45,7 @@ python -m venv .venv
 source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 
 # Install in development mode
-pip install -e .
+pip install -e .[dev]
 
 # Install Playwright browsers
 playwright install chromium

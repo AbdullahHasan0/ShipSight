@@ -139,6 +139,21 @@ If you prefer to manage the environment yourself:
 
 ---
 
+## 👩‍💻 Development
+
+Want to contribute?
+
+1.  **Install Dev Dependencies**:
+    ```bash
+    pip install -e .[dev]
+    ```
+2.  **Run Tests**:
+    ```bash
+    pytest
+    ```
+
+---
+
 ## 🤝 Key Principles
 
 *   **Context Hygiene**: We never send your `node_modules`, `.git`, or `.skills` to the AI. Only the code that matters.

@@ -2,6 +2,8 @@ import asyncio
 from pathlib import Path
 from playwright.async_api import async_playwright
 
+import html
+
 class Carbonizer:
     def __init__(self, output_dir: Path, theme: str = "monokai"):
         self.output_dir = (output_dir / "code_visuals")
@@ -42,6 +44,8 @@ class Carbonizer:
     async def carbonize(self, code: str, filename: str):
         """Render code as a beautiful image with syntax highlighting using Highlight.js."""
         language = self._detect_language(filename)
+        
+        escaped_code = html.escape(code)
         
         html_template = f"""
         <!DOCTYPE html>
@@ -166,7 +170,7 @@ class Carbonizer:
                     <div class="filename">{filename}</div>
                 </div>
                 <div class="code-container">
-                    <pre><code class="language-{language}">{code.replace('<', '&lt;').replace('>', '&gt;')}</code></pre>
+                    <pre><code class="language-{language}">{escaped_code}</code></pre>
                 </div>
             </div>
             <script>
